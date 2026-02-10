@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Usuń post{% endblock %}
+{% block content %}
+<div class="create-post-container">
+    <div class="create-post-card delete-confirmation">
+        <h1>Usuń post</h1>
+        
+        <div class="warning-message">
+            <p>Czy na pewno chcesz usunąć ten post?</p>
+            <div class="post-preview">
+                <p><strong>Treść posta:</strong></p>
+                <p>{{ post.body }}</p>
+            </div>
+            <p class="warning-text">Ta operacja jest nieodwracalna!</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn-danger">Tak, usuń post</button>
+                <a href="{% url 'feed' %}" class="btn-secondary">Anuluj</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

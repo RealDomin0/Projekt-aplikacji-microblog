@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Strona główna{% endblock %}
+{% block content %}
+<div class="feed-container">
+    <!-- Pasek wyszukiwania -->
+    <div class="search-container">
+        <form method="get" action="{% url 'feed' %}" class="search-form">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Szukaj postów..." 
+                class="search-input"
+                value="{{ search_query|default:'' }}"
+            >
+            <button type="submit" class="search-button">🔍</button>
+            {% if search_query %}
+                <a href="{% url 'feed' %}" class="clear-search">✕</a>
+            {% endif %}
+        </form>
+        {% if search_query %}
+            <p class="search-info">
+                Wyniki dla: <strong>"{{ search_query }}"</strong>
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="posts-list">
+        <h2>{% if search_query %}Wyniki wyszukiwania{% else %}Najnowsze posty{% endif %}</h2>
+        {% for post in posts %}
+            <div class="post-card">
+                <div class="post-header">
+                    <img src="{{ post.author.profile.get_avatar_url }}"
+                         class="avatar-small"
+                         alt="Avatar {{ post.author.username }}">
+                    <div class="post-info">
+                        <a href="{% url 'profile_detail' post.author.username %}" class="post-author">
+                            {{ post.author.username }}
+                        </a>
+                        <span class="post-date">
+                            {{ post.created|date:"d.m.Y H:i" }}
+                        </span>
+                    </div>
+                    
+                    {% if post.author == request.user %}
+                        <div class="post-menu-container">
+                            <button class="post-menu-button" data-post-id="{{ post.id }}">
+                                <span class="dots">⋮</span>
+                            </button>
+                            <div class="post-menu-dropdown" id="menu-{{ post.id }}">
+                                <a href="{% url 'post_edit' post.id %}" class="menu-item edit">
+                                    <span class="menu-icon">✏️</span>
+                                    Edytuj
+                                </a>
+                                <a href="{% url 'post_delete' post.id %}" class="menu-item delete">
+                                    <span class="menu-icon">🗑️</span>
+                                    Usuń
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="post-body">
+                    {{ post.body|linebreaks }}
+                </div>
+                <div class="post-actions">
+                    <form method="post" action="{% url 'post_like' post.id %}" class="like-form" data-post-id="{{ post.id }}">
+                        {% csrf_token %}
+                        <button type="submit" class="like-button {% if request.user in post.likes.all %}liked{% endif %}">
+                            <span class="heart-icon">❤</span>
+                            <span class="like-count">{{ post.total_likes }}</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <div class="no-posts">
+                <p>Brak postów. Kliknij "Utwórz post" aby dodać pierwszy post!</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+// AJAX dla polubień (opcjonalne - działa bez przeładowania strony)
+document.addEventListener('DOMContentLoaded', function() {
+    const likeForms = document.querySelectorAll('.like-form');
+    
+    likeForms.forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const postId = this.dataset.postId;
+            const button = this.querySelector('.like-button');
+            const countSpan = this.querySelector('.like-count');
+            const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            try {
+                const response = await fetch(`/like/${postId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+                
+                const data = await response.json();
+                
+                // Zaktualizuj UI
+                if (data.liked) {
+                    button.classList.add('liked');
+                } else {
+                    button.classList.remove('liked');
+                }
+                countSpan.textContent = data.total_likes;
+                
+            } catch (error) {
+                console.error('Błąd:', error);
+            }
+        });
+    });
+    
+    // Obsługa dropdown menu dla postów
+    const menuButtons = document.querySelectorAll('.post-menu-button');
+    
+    menuButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const postId = this.dataset.postId;
+            const menu = document.getElementById(`menu-${postId}`);
+            
+            // Zamknij wszystkie inne menu
+            document.querySelectorAll('.post-menu-dropdown').forEach(m => {
+                if (m !== menu) {
+                    m.classList.remove('show');
+                }
+            });
+            
+            // Toggle current menu
+            menu.classList.toggle('show');
+        });
+    });
+    
+    // Zamknij menu po kliknięciu poza nim
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.post-menu-container')) {
+            document.querySelectorAll('.post-menu-dropdown').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

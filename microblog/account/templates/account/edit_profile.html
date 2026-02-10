@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Edytuj profil{% endblock %}
+{% block content %}
+<div class="edit-profile-container">
+    <h1>Edytuj profil</h1>
+    <form method="post" enctype="multipart/form-data" class="edit-profile-form">
+        {% csrf_token %}
+        <div class="form-section">
+            <h3>Dane konta</h3>
+            {{ user_form.as_p }}
+        </div>
+        <div class="form-section">
+            <h3>Dane profilu</h3>
+            {% if request.user.profile.photo %}
+                <div class="current-photo">
+                    <p>Aktualne zdjęcie profilowe:</p>
+                    <img src="{{ request.user.profile.photo.url }}" alt="Zdjęcie profilowe">
+                </div>
+            {% endif %}
+            {{ profile_form.as_p }}
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Zapisz zmiany</button>
+            <a href="{% url 'feed' %}" class="btn-secondary">Anuluj</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

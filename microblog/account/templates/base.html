@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %} {% endblock %}</title>
+    <link href="{% static "css/base.css" %}" rel="stylesheet">
+</head>
+<body>
+    <div id="header">
+        <span class="logo">Microblog</span>
+        {% if request.user.is_authenticated %}
+            <div class="header-nav">
+                <a href="{% url 'feed' %}" class="nav-link">Strona główna</a>
+                <a href="{% url 'post_create' %}" class="nav-link">Utwórz post</a>
+            </div>
+        {% endif %}
+        <span class="user">
+            {% if request.user.is_authenticated %}
+            <div class="user-dropdown">
+                <button class="user-button avatar-button" id="userMenuButton">
+                    <img src="{{ request.user.profile.get_avatar_url }}" alt="Avatar" class="avatar">
+                </button>
+                <div class="dropdown-content" id="dropdownMenu">
+                    <a href="{% url 'profile_detail' request.user.username %}">Mój profil</a>
+                    
+                    <form action="{% url "logout" %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Wyloguj</button>
+                    </form>
+                    
+                </div>
+            </div>
+            {% else %}
+                <a href="{% url "login" %}">Zaloguj</a>
+            {% endif %}
+        </span>
+    </div>
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+    
+    <script>
+        // Toggle dropdown menu
+        const userButton = document.getElementById('userMenuButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        
+        if (userButton && dropdownMenu) {
+            userButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
+            
+            // Zamknij menu po kliknięciu poza nim
+            document.addEventListener('click', function(e) {
+                if (!userButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

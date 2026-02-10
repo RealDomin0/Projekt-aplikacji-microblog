@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Utwórz post{% endblock %}
+{% block content %}
+<div class="create-post-container">
+    <div class="create-post-card">
+        <h1>Utwórz nowy post</h1>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                {{ form.body.label_tag }}
+                {{ form.body }}
+                {% if form.body.errors %}
+                    <div class="form-errors">
+                        {{ form.body.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Opublikuj</button>
+                <a href="{% url 'feed' %}" class="btn-secondary">Anuluj</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

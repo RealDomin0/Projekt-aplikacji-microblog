@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}
+    {% if is_owner %}Mój profil{% else %}Profil {{ user_obj.username }}{% endif %}
+{% endblock %}
+{% block content %}
+<div class="profile-container">
+    <h1>
+        {% if is_owner %}
+            Mój profil
+        {% else %}
+            Profil użytkownika {{ user_obj.username }}
+        {% endif %}
+    </h1>
+    <div class="profile-card">
+        <div class="profile-photo">
+            <img src="{{ profile.get_avatar_url }}" alt="Avatar {{ user_obj.username }}">
+            {% if not user_obj.profile.photo %}
+                <p class="avatar-note">Domyślny avatar</p>
+            {% endif %}
+        </div>
+        <div class="profile-info">
+            <p><strong>Nazwa użytkownika:</strong> {{ user_obj.username }}</p>
+            {% if user_obj.profile.bio %}
+                <p><strong>Opis:</strong><br>{{ user_obj.profile.bio }}</p>
+            {% endif %}
+            {% if user_obj.profile.date_of_birth %}
+                <p><strong>Data urodzenia:</strong>
+                   {{ user_obj.profile.date_of_birth|date:"d.m.Y" }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% if is_owner %}
+    <div class="profile-actions">
+        <a href="{% url 'edit_profile' %}" class="btn-primary">
+            Edytuj profil
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

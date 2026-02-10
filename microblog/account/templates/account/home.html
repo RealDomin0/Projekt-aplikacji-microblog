@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Strona główna{% endblock %}
+
+{% block content %}
+    <h1>Witaj, {{ request.user.username }}!</h1>
+    
+    <div class="posts-container">
+        <h2>Najnowsze posty</h2>
+        
+        <!-- Tu będą wyświetlane posty -->
+        <p>Tutaj pojawią się posty użytkowników...</p>
+        
+        <!-- Przykładowa struktura dla przyszłych postów:
+        {% for post in posts %}
+            <div class="post">
+                <div class="post-header">
+                    <img src="{{ post.author.profile.get_avatar_url }}" alt="Avatar">
+                    <span>{{ post.author.username }}</span>
+                    <span class="post-date">{{ post.created }}</span>
+                </div>
+                <div class="post-content">
+                    {{ post.content }}
+                </div>
+            </div>
+        {% endfor %}
+        -->
+    </div>
+{% endblock %}
