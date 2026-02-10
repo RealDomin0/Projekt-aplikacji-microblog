@@ -94,7 +94,7 @@ microblog
 ## Uruchomienie projektu
 1. Sklonuj repozytorium:
 ```
-git clone https://github.com/RealDomin0/microblog.git
+git clone https://github.com/RealDomin0/Projekt-aplikacji-microblog.git
 ```
 2. Przejdź do katalogu projektu:
 ```
